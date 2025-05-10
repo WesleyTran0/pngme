@@ -38,10 +38,10 @@ impl TryFrom<&Vec<u8>> for Chunk {
         let chunk_type = ChunkType::try_from([data[4], data[5], data[6], data[7]]).unwrap();
 
         let crc = bytes_to_u32([
-            data[data_end_idx - 1],
             data[data_end_idx],
             data[data_end_idx + 1],
             data[data_end_idx + 2],
+            data[data_end_idx + 3],
         ]);
 
         Ok(Chunk {
