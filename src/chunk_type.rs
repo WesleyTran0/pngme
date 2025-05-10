@@ -97,7 +97,7 @@ impl ChunkType {
         }
     }
     // Converts this ChunkType's bits to their byte representation
-    fn bytes(&self) -> [u8; 4] {
+    pub fn bytes(&self) -> [u8; 4] {
         [
             bits_to_byte(&self.byte_four),
             bits_to_byte(&self.byte_three),

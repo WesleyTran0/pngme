@@ -26,7 +26,7 @@ pub fn u8_to_bits(num: u8) -> [bool; 8] {
     fin_arr
 }
 
-// Converts bit representations to its byte
+// Converts bit representations to its byte where idx 0 is the MSB
 pub fn bits_to_byte(rep: &[bool; 8]) -> u8 {
     let mut sum = 0u8;
 
@@ -35,6 +35,18 @@ pub fn bits_to_byte(rep: &[bool; 8]) -> u8 {
         if bit {
             sum += 1u8 << (7 - idx);
         }
+    }
+
+    sum
+}
+
+// Converts 4 bytes to its u32 representation where index 0 is the MSB
+pub fn bytes_to_u32(rep: [u8; 4]) -> u32 {
+    let mut sum = 0u32;
+
+    // EFFECT: Converts each u8 to its u32 representation and adds it to sum
+    for (idx, &byte) in rep.iter().enumerate() {
+        sum += (byte as u32) << (8 * (3 - idx));
     }
 
     sum
