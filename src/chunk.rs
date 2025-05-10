@@ -1,3 +1,4 @@
+use crate::conversions::u32_to_bytes;
 use crate::{chunk_type::ChunkType, conversions::bytes_to_u32, conversions::u8_to_string};
 use crc::{CRC_32_ISO_HDLC, Crc};
 use std::fmt;
@@ -129,10 +130,21 @@ impl Chunk {
         Ok(data_str)
     }
 
-    // Returns
-    // fn as_bytes(&self) -> Vec<u8> {
+    // Returns this Chunk as a list of its bytes. Index 0 - 3 is the length,
+    // Index 4 - 7 is the Chunk type. Index 8 - 8 + length is the data
+    // and the last 4 indexes are the CRC
+    fn as_bytes(&self) -> Vec<u8> {
+        let mut chunk_as_vec = Vec::<u8>::new();
 
-    // }
+        chunk_as_vec.extend_from_slice(&u32_to_bytes(self.length));
+        chunk_as_vec.extend_from_slice(&self.chunk_type.bytes());
+
+        let mut chunk_data = self.chunk_data_bytes.clone();
+        chunk_as_vec.append(&mut chunk_data);
+        chunk_as_vec.extend_from_slice(&u32_to_bytes(self.crc));
+
+        chunk_as_vec
+    }
 }
 
 #[cfg(test)]
@@ -262,5 +274,25 @@ mod tests {
         let chunk: Chunk = TryFrom::try_from(chunk_data.as_ref()).unwrap();
 
         let _chunk_string = format!("{}", chunk);
+    }
+
+    #[test]
+    pub fn test_as_bytes() {
+        let data_length: u32 = 42;
+        let chunk_type = "RuSt".as_bytes();
+        let message_bytes = "This is where your secret message will be!".as_bytes();
+        let crc: u32 = 2882656334;
+
+        let chunk_data: Vec<u8> = data_length
+            .to_be_bytes()
+            .iter()
+            .chain(chunk_type.iter())
+            .chain(message_bytes.iter())
+            .chain(crc.to_be_bytes().iter())
+            .copied()
+            .collect();
+
+        let chunk: Chunk = TryFrom::try_from(chunk_data.as_ref()).unwrap();
+        assert_eq!(chunk_data, chunk.as_bytes());
     }
 }

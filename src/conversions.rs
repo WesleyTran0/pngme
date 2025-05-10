@@ -51,3 +51,13 @@ pub fn bytes_to_u32(rep: [u8; 4]) -> u32 {
 
     sum
 }
+
+// Converts u32 to its u8 representation where index 0 is the MSB
+pub fn u32_to_bytes(rep: u32) -> [u8; 4] {
+    [
+        ((rep >> 24) & 0xff) as u8,
+        ((rep >> 16) & 0xff) as u8,
+        ((rep >> 8) & 0xff) as u8,
+        (rep & 0xff) as u8,
+    ]
+}
