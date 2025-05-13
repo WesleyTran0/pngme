@@ -7,7 +7,6 @@ use std::fmt;
 use std::fmt::{Debug, Display};
 
 // Represents a Chunk of an image
-#[derive(Debug)]
 pub struct Chunk {
     // length and crc are both 4 byte unsigned integers
     length: u32,
