@@ -23,7 +23,7 @@ impl Png {
         let mut chunks = Vec::<Chunk>::new();
 
         // EFFECT: parse through all bytes until there are no more Chunks to be made
-        while cur_idx <= num_bytes {
+        while cur_idx < num_bytes {
             let cur_chunk_len = bytes_to_u32([
                 bytes[cur_idx],
                 bytes[cur_idx + 1],
@@ -80,11 +80,11 @@ impl TryFrom<&[u8]> for Png {
     type Error = ParsePngError;
 
     fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
-        if bytes.len() < 9 || &bytes[0..7] != Png::STANDARD_HEADER {
+        if bytes.len() < 9 || &bytes[0..8] != Png::STANDARD_HEADER {
             return Err(ParsePngError);
         }
 
-        let header = match bytes[0..7].try_into() {
+        let header = match bytes[0..8].try_into() {
             Ok(header) => header,
             Err(_) => return Err(ParsePngError),
         };
