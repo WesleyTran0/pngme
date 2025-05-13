@@ -1,8 +1,4 @@
-use crate::{
-    chunk::{Chunk, ParseChunkError},
-    chunk_type::{ChunkType, ParseChunkTypeError},
-    conversions::bytes_to_u32,
-};
+use crate::{chunk::Chunk, chunk_type::ChunkType, conversions::bytes_to_u32};
 use std::fmt::{Debug, Display};
 
 // Represents a PNG file by its Chunks
@@ -40,7 +36,8 @@ impl Png {
                 bytes[cur_idx + 7],
             ])
             .unwrap();
-            let cur_data: Vec<u8> = bytes[cur_idx + 8..cur_idx + cur_chunk_len as usize].to_vec();
+            let cur_data: Vec<u8> =
+                bytes[cur_idx + 8..cur_idx + 8 + cur_chunk_len as usize].to_vec();
 
             cur_idx += 12 + cur_chunk_len as usize;
             chunks.push(Chunk::new(cur_chunk_type, cur_data));
@@ -151,13 +148,14 @@ impl Display for Png {
     }
 }
 
+#[allow(unused_variables)]
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::chunk::Chunk;
     use crate::chunk_type::{ChunkType, ParseChunkTypeError};
     use std::convert::TryFrom;
-    use std::str::FromStr;
+    // use std::str::FromStr;
 
     fn testing_chunks() -> Vec<Chunk> {
         vec![
@@ -310,6 +308,7 @@ mod tests {
         let png: Png = TryFrom::try_from(bytes.as_ref()).unwrap();
 
         let _png_string = format!("{}", png);
+        println!("{_png_string}");
     }
 
     // // This is the raw bytes for a shrunken version of the `dice.png` image on Wikipedia

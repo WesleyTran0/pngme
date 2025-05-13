@@ -149,6 +149,7 @@ impl Chunk {
     }
 }
 
+#[allow(unused_variables)]
 #[cfg(test)]
 mod tests {
     use super::*;
