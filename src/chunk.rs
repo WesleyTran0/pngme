@@ -1,11 +1,13 @@
-use crate::conversions::u32_to_bytes;
-use crate::{chunk_type::ChunkType, conversions::bytes_to_u32, conversions::u8_to_string};
+use crate::{
+    chunk_type::ChunkType,
+    conversions::{bytes_to_u32, u8_to_string, u32_to_bytes},
+};
 use crc::{CRC_32_ISO_HDLC, Crc};
 use std::fmt;
 use std::fmt::{Debug, Display};
 
 // Represents a Chunk of an image
-struct Chunk {
+pub struct Chunk {
     // length and crc are both 4 byte unsigned integers
     length: u32,
     chunk_type: ChunkType,
@@ -14,7 +16,7 @@ struct Chunk {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct ParseChunkError;
+pub struct ParseChunkError;
 
 // Allows this Chunk to be made from a vec of bytes where:
 // the first 4 bytes are length, next 4 are the ChunkType, the last 4 are the crc
@@ -72,7 +74,7 @@ impl Display for Chunk {
 // independent functions for Chunk
 impl Chunk {
     // Creates a new Chunk object from the given ChunkType and data as bytes
-    fn new(chunk_type: ChunkType, data: Vec<u8>) -> Chunk {
+    pub fn new(chunk_type: ChunkType, data: Vec<u8>) -> Chunk {
         let length = data.len() as u32;
 
         let chunk_type_bytes = chunk_type.bytes();
@@ -133,7 +135,7 @@ impl Chunk {
     // Returns this Chunk as a list of its bytes. Index 0 - 3 is the length,
     // Index 4 - 7 is the Chunk type. Index 8 - 8 + length is the data
     // and the last 4 indexes are the CRC
-    fn as_bytes(&self) -> Vec<u8> {
+    pub fn as_bytes(&self) -> Vec<u8> {
         let mut chunk_as_vec = Vec::<u8>::new();
 
         chunk_as_vec.extend_from_slice(&u32_to_bytes(self.length));
