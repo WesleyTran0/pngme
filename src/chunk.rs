@@ -98,7 +98,7 @@ impl Chunk {
     }
 
     // Returns a reference to this Chunk's ChunkType
-    fn chunk_type(&self) -> &ChunkType {
+    pub fn chunk_type(&self) -> &ChunkType {
         &self.chunk_type
     }
 

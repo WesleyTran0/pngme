@@ -11,6 +11,9 @@ struct Png {
     chunks: Vec<Chunk>,
 }
 
+#[derive(Debug, PartialEq, Eq)]
+struct ChunkRemovalError;
+
 impl Png {
     pub const STANDARD_HEADER: [u8; 8] = [137, 80, 78, 71, 13, 10, 26, 10];
 
@@ -63,12 +66,45 @@ impl Png {
         self.chunks.push(chunk);
     }
 
-    // Removes the first chunk in this Png
-    // fn remove_first_chunk(&mut self, chunk_type: &str) -> Result<Chunk, std::io::Error> {}
+    // Removes the first chunk in this Png that has the same ChunkType as the given ChunkType
+    // If the given chunk-type doesn't exist in our png, return an error
+    fn remove_first_chunk(&mut self, chunk_type: &str) -> Result<Chunk, ChunkRemovalError> {
+        self.chunk_by_type(chunk_type)
+            .and_then(|found| {
+                self.chunks()
+                    .iter()
+                    .position(|chunk| std::ptr::eq(chunk, found))
+            })
+            .map(|idx| self.chunks.remove(idx))
+            .ok_or(ChunkRemovalError)
+    }
+
+    // Returns the header of this Png. It should always be equal to the STANDARD_HEADER
+    fn header(&self) -> &[u8; 8] {
+        &self.header
+    }
 
     // Returns the chunks in this Png
     fn chunks(&self) -> &[Chunk] {
         &self.chunks[0..self.chunks.len()]
+    }
+
+    // Finds the first Chunk in this Png that has the same ChunkType
+    // as the given ChunkType
+    fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
+        self.chunks()
+            .iter()
+            .find(|chunk| format!("{}", chunk.chunk_type()) == chunk_type)
+    }
+
+    // Converts this Png into a Vec of bytes
+    fn as_bytes(&self) -> Vec<u8> {
+        let png_vec = self.header().to_vec();
+
+        self.chunks().iter().fold(png_vec, |mut accum_vec, chunk| {
+            accum_vec.extend_from_slice(&chunk.as_bytes());
+            accum_vec
+        })
     }
 }
 
@@ -218,45 +254,45 @@ mod tests {
         assert_eq!(chunks.len(), 3);
     }
 
-    // #[test]
-    // fn test_chunk_by_type() {
-    //     let png = testing_png();
-    //     let chunk = png.chunk_by_type("FrSt").unwrap();
-    //     assert_eq!(&chunk.chunk_type().to_string(), "FrSt");
-    //     assert_eq!(&chunk.data_as_string().unwrap(), "I am the first chunk");
-    // }
+    #[test]
+    fn test_chunk_by_type() {
+        let png = testing_png();
+        let chunk = png.chunk_by_type("FrSt").unwrap();
+        assert_eq!(&chunk.chunk_type().to_string(), "FrSt");
+        assert_eq!(&chunk.data_as_string().unwrap(), "I am the first chunk");
+    }
 
-    // #[test]
-    // fn test_append_chunk() {
-    //     let mut png = testing_png();
-    //     png.append_chunk(chunk_from_strings("TeSt", "Message").unwrap());
-    //     let chunk = png.chunk_by_type("TeSt").unwrap();
-    //     assert_eq!(&chunk.chunk_type().to_string(), "TeSt");
-    //     assert_eq!(&chunk.data_as_string().unwrap(), "Message");
-    // }
+    #[test]
+    fn test_append_chunk() {
+        let mut png = testing_png();
+        png.append_chunk(chunk_from_strings("TeSt", "Message").unwrap());
+        let chunk = png.chunk_by_type("TeSt").unwrap();
+        assert_eq!(&chunk.chunk_type().to_string(), "TeSt");
+        assert_eq!(&chunk.data_as_string().unwrap(), "Message");
+    }
 
-    // #[test]
-    // fn test_remove_first_chunk() {
-    //     let mut png = testing_png();
-    //     png.append_chunk(chunk_from_strings("TeSt", "Message").unwrap());
-    //     png.remove_first_chunk("TeSt").unwrap();
-    //     let chunk = png.chunk_by_type("TeSt");
-    //     assert!(chunk.is_none());
-    // }
+    #[test]
+    fn test_remove_first_chunk() {
+        let mut png = testing_png();
+        png.append_chunk(chunk_from_strings("TeSt", "Message").unwrap());
+        png.remove_first_chunk("TeSt").unwrap();
+        let chunk = png.chunk_by_type("TeSt");
+        assert!(chunk.is_none());
+    }
 
-    // #[test]
-    // fn test_png_from_image_file() {
-    //     let png = Png::try_from(&PNG_FILE[..]);
-    //     assert!(png.is_ok());
-    // }
+    #[test]
+    fn test_png_from_image_file() {
+        let png = Png::try_from(&PNG_FILE[..]);
+        assert!(png.is_ok());
+    }
 
-    // #[test]
-    // fn test_as_bytes() {
-    //     let png = Png::try_from(&PNG_FILE[..]).unwrap();
-    //     let actual = png.as_bytes();
-    //     let expected: Vec<u8> = PNG_FILE.to_vec();
-    //     assert_eq!(actual, expected);
-    // }
+    #[test]
+    fn test_as_bytes() {
+        let png = Png::try_from(&PNG_FILE[..]).unwrap();
+        let actual = png.as_bytes();
+        let expected: Vec<u8> = PNG_FILE.to_vec();
+        assert_eq!(actual, expected);
+    }
 
     #[test]
     fn test_png_trait_impls() {
