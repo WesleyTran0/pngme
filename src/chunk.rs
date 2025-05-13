@@ -113,7 +113,7 @@ impl Chunk {
     }
 
     // Returns the data represented as a String hidden in this Chunk
-    fn data_as_string(&self) -> Result<String, std::io::Error> {
+    pub fn data_as_string(&self) -> Result<String, std::io::Error> {
         let data = &self.data();
         let mut data_str = String::new();
 

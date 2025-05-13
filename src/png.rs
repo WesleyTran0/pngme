@@ -95,9 +95,25 @@ impl TryFrom<&[u8]> for Png {
 }
 
 // Displays this Png in a formatted manner
-// impl Display for Png {
-//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {}
-// }
+impl Display for Png {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut png_str = String::new();
+
+        // EFFECT: Combines all messages hidden in the Chunks of this Png
+        // into one string
+        for chunk in self.chunks() {
+            match chunk.data_as_string() {
+                Ok(str) => {
+                    png_str.push_str(&str);
+                    png_str.push_str("\n");
+                }
+                Err(_) => panic!("There was an error formatting this png"),
+            };
+        }
+
+        write!(f, "{}", png_str)
+    }
+}
 
 #[cfg(test)]
 mod tests {
