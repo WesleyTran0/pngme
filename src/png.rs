@@ -2,13 +2,13 @@ use crate::{chunk::Chunk, chunk_type::ChunkType, conversions::bytes_to_u32};
 use std::fmt::{Debug, Display};
 
 /// Represents a PNG file by its Chunks
-struct Png {
+pub struct Png {
     header: [u8; 8],
     chunks: Vec<Chunk>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct ChunkRemovalError;
+pub struct ChunkRemovalError;
 
 impl Png {
     pub const STANDARD_HEADER: [u8; 8] = [137, 80, 78, 71, 13, 10, 26, 10];
@@ -59,13 +59,13 @@ impl Png {
     }
 
     /// Appends the given Chunk to this Png
-    fn append_chunk(&mut self, chunk: Chunk) {
+    pub fn append_chunk(&mut self, chunk: Chunk) {
         self.chunks.push(chunk);
     }
 
     /// Removes the first chunk in this Png that has the same ChunkType as the given ChunkType
     /// If the given chunk-type doesn't exist in our png, return an error
-    fn remove_first_chunk(&mut self, chunk_type: &str) -> Result<Chunk, ChunkRemovalError> {
+    pub fn remove_first_chunk(&mut self, chunk_type: &str) -> Result<Chunk, ChunkRemovalError> {
         self.chunk_by_type(chunk_type)
             .and_then(|found| {
                 self.chunks()
@@ -88,14 +88,14 @@ impl Png {
 
     /// Finds the first Chunk in this Png that has the same ChunkType
     /// as the given ChunkType
-    fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
+    pub fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
         self.chunks()
             .iter()
             .find(|chunk| format!("{}", chunk.chunk_type()) == chunk_type)
     }
 
     /// Converts this Png into a Vec of bytes
-    fn as_bytes(&self) -> Vec<u8> {
+    pub fn as_bytes(&self) -> Vec<u8> {
         let png_vec = self.header().to_vec();
 
         self.chunks().iter().fold(png_vec, |mut accum_vec, chunk| {
@@ -106,7 +106,7 @@ impl Png {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct ParsePngError;
+pub struct ParsePngError;
 
 /// Tries to create a Png from the list of bytes
 impl TryFrom<&[u8]> for Png {

@@ -15,5 +15,5 @@ fn main() -> Result<()> {
 
     cli.process_command();
 
-    todo!()
+    Ok(())
 }
