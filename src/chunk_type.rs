@@ -3,6 +3,7 @@ use std::fmt;
 use std::fmt::{Debug, Display};
 use std::str::FromStr;
 
+/// Represents a ChunkType stored in every Chunk
 #[derive(Debug, PartialEq, Eq)]
 pub struct ChunkType {
     // arrays stored in each field are MSBit in idx 0 and LSBit in idx 7
@@ -13,10 +14,11 @@ pub struct ChunkType {
     byte_one: [bool; 8],
 }
 
+/// Represents an error encountered when parsing an input for ChunkType
 #[derive(Debug, PartialEq, Eq)]
 pub struct ParseChunkTypeError;
 
-// Allows the ChunkType to be made from an array of 4 u8 integers
+/// Allows the ChunkType to be made from an array of 4 u8 integers
 impl TryFrom<[u8; 4]> for ChunkType {
     type Error = ParseChunkTypeError;
 
@@ -43,7 +45,7 @@ impl TryFrom<[u8; 4]> for ChunkType {
     }
 }
 
-// Allows a ChunkType to be made from a 4 character String. Must be alphabetic characters
+/// Allows a ChunkType to be made from a 4 character String. Must be alphabetic characters
 impl FromStr for ChunkType {
     // arrays stored in each field are MSBit in idx 0 and LSBit in idx 7
     // byte_four represents the MSByte and byte_one represents the LSByte
@@ -67,7 +69,7 @@ impl FromStr for ChunkType {
     }
 }
 
-// Allows a ChunkType to be displayed as a string
+/// Allows a ChunkType to be displayed as a string
 impl Display for ChunkType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let ct_str = String::new();
@@ -84,10 +86,10 @@ impl Display for ChunkType {
 }
 
 #[allow(dead_code)]
-// Represents a ChunkType consisting of 4 bytes. Byte_four is the left and MSByte
-// The bits in each byte are ordered from MSBit to LSBit
+/// Represents a ChunkType consisting of 4 bytes. Byte_four is the left and MSByte
+/// The bits in each byte are ordered from MSBit to LSBit
 impl ChunkType {
-    // Creates a ChunkType from 4 bit representations of bytes. Where index0 is the MSB
+    /// Creates a ChunkType from 4 bit representations of bytes. Where index0 is the MSB
     fn from_arr_bytes(bytes: [[bool; 8]; 4]) -> ChunkType {
         ChunkType {
             byte_four: bytes[0],
@@ -96,7 +98,7 @@ impl ChunkType {
             byte_one: bytes[3],
         }
     }
-    // Converts this ChunkType's bits to their byte representation
+    /// Converts this ChunkType's bits to their byte representation
     pub fn bytes(&self) -> [u8; 4] {
         [
             bits_to_byte(&self.byte_four),
@@ -106,8 +108,8 @@ impl ChunkType {
         ]
     }
 
-    // Determines if this ChunkType is valid; A ChunkType is valid if the
-    // 2nd byte is an uppercase letter
+    /// Determines if this ChunkType is valid; A ChunkType is valid if the
+    /// 2nd byte is an uppercase letter
     fn is_valid(&self) -> bool {
         let byte_three_num = bits_to_byte(&self.byte_two);
 
@@ -121,26 +123,26 @@ impl ChunkType {
         !&self.byte_two[2]
     }
 
-    // Determines if this ChunkType is critical (false) or ancillary (true)
-    // A ChunkType is one or the other based on if the 4th byte is an uppercase letter
+    /// Determines if this ChunkType is critical (false) or ancillary (true)
+    /// A ChunkType is one or the other based on if the 4th byte is an uppercase letter
     fn is_critical(&self) -> bool {
         !&self.byte_four[2]
     }
 
-    // Determines if this ChunkType is public.
-    // A ChunkType is public if the 3rd byte is a lowercase letter
+    /// Determines if this ChunkType is public.
+    /// A ChunkType is public if the 3rd byte is a lowercase letter
     fn is_public(&self) -> bool {
         !&self.byte_three[2]
     }
 
-    // Determines if this ChunkType is reserved.
-    // A ChunkType is reserved if it is valid
+    /// Determines if this ChunkType is reserved.
+    /// A ChunkType is reserved if it is valid
     fn is_reserved_bit_valid(&self) -> bool {
         *&self.is_valid()
     }
 
-    // Determines if this ChunkType is safe-to-copy.
-    // A ChunkType is safe-to-copy if the 1st byte is a lowercase letter
+    /// Determines if this ChunkType is safe-to-copy.
+    /// A ChunkType is safe-to-copy if the 1st byte is a lowercase letter
     fn is_safe_to_copy(&self) -> bool {
         *&self.byte_one[2]
     }

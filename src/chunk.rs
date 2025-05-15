@@ -6,7 +6,7 @@ use crc::{CRC_32_ISO_HDLC, Crc};
 use std::fmt;
 use std::fmt::{Debug, Display};
 
-// Represents a Chunk of an image
+/// Represents a Chunk of an image
 pub struct Chunk {
     // length and crc are both 4 byte unsigned integers
     length: u32,
@@ -18,9 +18,9 @@ pub struct Chunk {
 #[derive(Debug, PartialEq, Eq)]
 pub struct ParseChunkError;
 
-// Allows this Chunk to be made from a vec of bytes where:
-// the first 4 bytes are length, next 4 are the ChunkType, the last 4 are the crc
-// and the other bytes are the message in the chunk
+/// Allows this Chunk to be made from a vec of bytes where:
+/// the first 4 bytes are length, next 4 are the ChunkType, the last 4 are the crc
+/// and the other bytes are the message in the chunk
 impl TryFrom<&Vec<u8>> for Chunk {
     type Error = ParseChunkError;
 
@@ -61,7 +61,7 @@ impl TryFrom<&Vec<u8>> for Chunk {
     }
 }
 
-// Allows this Chunk to be display in a string through formatting
+/// Allows this Chunk to be display in a string through formatting
 impl Display for Chunk {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.data_as_string() {
@@ -71,9 +71,9 @@ impl Display for Chunk {
     }
 }
 
-// independent functions for Chunk
+/// independent functions for Chunk
 impl Chunk {
-    // Creates a new Chunk object from the given ChunkType and data as bytes
+    /// Creates a new Chunk object from the given ChunkType and data as bytes
     pub fn new(chunk_type: ChunkType, data: Vec<u8>) -> Chunk {
         let length = data.len() as u32;
 
@@ -92,27 +92,27 @@ impl Chunk {
         }
     }
 
-    // Returns the length of this Chunk
+    /// Returns the length of this Chunk
     fn length(&self) -> u32 {
         *&self.length
     }
 
-    // Returns a reference to this Chunk's ChunkType
+    /// Returns a reference to this Chunk's ChunkType
     pub fn chunk_type(&self) -> &ChunkType {
         &self.chunk_type
     }
 
-    // Returns the data represented as bytes hidden in this Chunk
+    /// Returns the data represented as bytes hidden in this Chunk
     fn data(&self) -> &[u8] {
         &self.chunk_data_bytes[0..*&self.chunk_data_bytes.len()]
     }
 
-    // Returns the crc of this Chunk
+    /// Returns the crc of this Chunk
     fn crc(&self) -> u32 {
         *&self.crc
     }
 
-    // Returns the data represented as a String hidden in this Chunk
+    /// Returns the data represented as a String hidden in this Chunk
     pub fn data_as_string(&self) -> Result<String, std::io::Error> {
         let data = &self.data();
         let mut data_str = String::new();
@@ -132,9 +132,9 @@ impl Chunk {
         Ok(data_str)
     }
 
-    // Returns this Chunk as a list of its bytes. Index 0 - 3 is the length,
-    // Index 4 - 7 is the Chunk type. Index 8 - 8 + length is the data
-    // and the last 4 indexes are the CRC
+    /// Returns this Chunk as a list of its bytes. Index 0 - 3 is the length,
+    /// Index 4 - 7 is the Chunk type. Index 8 - 8 + length is the data
+    /// and the last 4 indexes are the CRC
     pub fn as_bytes(&self) -> Vec<u8> {
         let mut chunk_as_vec = Vec::<u8>::new();
 

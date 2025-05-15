@@ -1,7 +1,7 @@
 use crate::{chunk::Chunk, chunk_type::ChunkType, conversions::bytes_to_u32};
 use std::fmt::{Debug, Display};
 
-// Represents a PNG file by its Chunks
+/// Represents a PNG file by its Chunks
 struct Png {
     header: [u8; 8],
     chunks: Vec<Chunk>,
@@ -13,9 +13,9 @@ struct ChunkRemovalError;
 impl Png {
     pub const STANDARD_HEADER: [u8; 8] = [137, 80, 78, 71, 13, 10, 26, 10];
 
-    // Parses an arr of bytes to create Chunks.
-    // If there is an Invalid Chunk: return an error,
-    // If there are bytes leftover: return an error,
+    /// Parses an arr of bytes to create Chunks.
+    /// If there is an Invalid Chunk: return an error,
+    /// If there are bytes leftover: return an error,
     fn parse_for_chunks(bytes: &[u8]) -> Result<Vec<Chunk>, ParsePngError> {
         let num_bytes = bytes.len();
         let mut cur_idx = 0;
@@ -50,7 +50,7 @@ impl Png {
         Ok(chunks)
     }
 
-    // Creates a Png from the list of Chunks
+    /// Creates a Png from the list of Chunks
     fn from_chunks(chunks: Vec<Chunk>) -> Png {
         Png {
             header: Png::STANDARD_HEADER,
@@ -58,13 +58,13 @@ impl Png {
         }
     }
 
-    // Appends the given Chunk to this Png
+    /// Appends the given Chunk to this Png
     fn append_chunk(&mut self, chunk: Chunk) {
         self.chunks.push(chunk);
     }
 
-    // Removes the first chunk in this Png that has the same ChunkType as the given ChunkType
-    // If the given chunk-type doesn't exist in our png, return an error
+    /// Removes the first chunk in this Png that has the same ChunkType as the given ChunkType
+    /// If the given chunk-type doesn't exist in our png, return an error
     fn remove_first_chunk(&mut self, chunk_type: &str) -> Result<Chunk, ChunkRemovalError> {
         self.chunk_by_type(chunk_type)
             .and_then(|found| {
@@ -76,25 +76,25 @@ impl Png {
             .ok_or(ChunkRemovalError)
     }
 
-    // Returns the header of this Png. It should always be equal to the STANDARD_HEADER
+    /// Returns the header of this Png. It should always be equal to the STANDARD_HEADER
     fn header(&self) -> &[u8; 8] {
         &self.header
     }
 
-    // Returns the chunks in this Png
+    /// Returns the chunks in this Png
     fn chunks(&self) -> &[Chunk] {
         &self.chunks[0..self.chunks.len()]
     }
 
-    // Finds the first Chunk in this Png that has the same ChunkType
-    // as the given ChunkType
+    /// Finds the first Chunk in this Png that has the same ChunkType
+    /// as the given ChunkType
     fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
         self.chunks()
             .iter()
             .find(|chunk| format!("{}", chunk.chunk_type()) == chunk_type)
     }
 
-    // Converts this Png into a Vec of bytes
+    /// Converts this Png into a Vec of bytes
     fn as_bytes(&self) -> Vec<u8> {
         let png_vec = self.header().to_vec();
 
@@ -108,7 +108,7 @@ impl Png {
 #[derive(Debug, PartialEq, Eq)]
 struct ParsePngError;
 
-// Tries to create a Png from the list of bytes
+/// Tries to create a Png from the list of bytes
 impl TryFrom<&[u8]> for Png {
     type Error = ParsePngError;
 
@@ -127,7 +127,7 @@ impl TryFrom<&[u8]> for Png {
     }
 }
 
-// Displays this Png in a formatted manner
+/// Displays this Png in a formatted manner
 impl Display for Png {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut png_str = String::new();
@@ -308,7 +308,6 @@ mod tests {
         let png: Png = TryFrom::try_from(bytes.as_ref()).unwrap();
 
         let _png_string = format!("{}", png);
-        println!("{_png_string}");
     }
 
     // // This is the raw bytes for a shrunken version of the `dice.png` image on Wikipedia
