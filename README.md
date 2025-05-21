@@ -1,6 +1,6 @@
 # PNGme
 
-PNGme is a Rust Crate that allows you to encode and decode messages within .png files
+PNGme is a binary built in Rust that allows you to encode and decode messages within .png files
 
 ## Installation
 
