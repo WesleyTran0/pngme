@@ -10,6 +10,8 @@ Next, run the pngme executable with `./pngme`
 
 The help menu will then be displayed, showing the usages of pngme and how you can play around with it.
 
+![pngme_tac_help](https://github.com/user-attachments/assets/ad74fe1a-4025-419e-a35b-d008ca3730a8)
+
 ## Acknowledgement
 
 This project was heavily inspired if not, made possible by an instruction repo I found. It had walked me through creating my first multiple file Rust project, teaching me to import crates and getting the hang of the way Rust leverages its functional nature. The link to the original github repo is [here](https://jrdngr.github.io/pngme_book/introduction.html) and I highly recommend checking it out to see what other projects [Robert Heaton](https://robertheaton.com/) has to offer!
